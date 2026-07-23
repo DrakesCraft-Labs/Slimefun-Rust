@@ -1,0 +1,41 @@
+name: Slimefun-Rust Engine CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test Workspace (Rust 2021)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check Workspace Syntax
+        run: cargo check --workspace --all-targets
+
+      - name: Run Unit Tests
+        run: cargo test --workspace
+
+      - name: Build Release Binaries
+        run: cargo build --release --workspace
+
+      - name: Upload Release Binaries Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: slimefun-rust-binaries-linux
+          path: |
+            target/release/slimefun-server
+            target/release/libslimefun_ffi.so
