@@ -1,0 +1,16 @@
+[package]
+name = "slimefun-ffi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+slimefun-core = { path = "../slimefun-core" }
+slimefun-energy = { path = "../slimefun-energy" }
+slimefun-cargo = { path = "../slimefun-cargo" }
+slimefun-addons = { path = "../slimefun-addons" }
+serde_json.workspace = true

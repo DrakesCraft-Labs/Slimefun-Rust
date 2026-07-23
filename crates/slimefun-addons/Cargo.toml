@@ -1,0 +1,14 @@
+[package]
+name = "slimefun-addons"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+slimefun-core = { path = "../slimefun-core" }
+slimefun-energy = { path = "../slimefun-energy" }
+slimefun-cargo = { path = "../slimefun-cargo" }
+serde.workspace = true
+serde_json.workspace = true
+dashmap.workspace = true

@@ -1,0 +1,12 @@
+[package]
+name = "slimefun-cargo"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+slimefun-core = { path = "../slimefun-core" }
+serde.workspace = true
+serde_json.workspace = true
+dashmap.workspace = true
