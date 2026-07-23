@@ -1,4 +1,6 @@
+use slimefun_core::SlimefunBlockData;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SlimefunAddonDescriptor {
@@ -8,9 +10,30 @@ pub struct SlimefunAddonDescriptor {
     pub active: bool,
 }
 
-pub struct AllAddonsRegistry;
+pub struct AllAddonsRegistry {
+    addon_listeners: HashMap<&'static str, fn(&SlimefunBlockData) -> u64>,
+}
 
 impl AllAddonsRegistry {
+    pub fn new() -> Self {
+        let mut listeners: HashMap<&'static str, fn(&SlimefunBlockData) -> u64> = HashMap::new();
+        
+        // Registrar dispatcher de ticks nativo para los 44 Addons
+        for addon in Self::get_all_44_addons() {
+            listeners.insert(addon.id, default_addon_ticker);
+        }
+
+        Self { addon_listeners: listeners }
+    }
+
+    pub fn dispatch_machine_tick(&self, addon_id: &str, block: &SlimefunBlockData) -> u64 {
+        if let Some(ticker_fn) = self.addon_listeners.get(addon_id) {
+            ticker_fn(block)
+        } else {
+            0
+        }
+    }
+
     pub fn get_all_44_addons() -> Vec<SlimefunAddonDescriptor> {
         vec![
             SlimefunAddonDescriptor { id: "networks_v6", name: "NetworksV6-Drake", category: "CARGO_ENERGY", active: true },
@@ -59,4 +82,9 @@ impl AllAddonsRegistry {
             SlimefunAddonDescriptor { id: "drakes_slime_market", name: "DrakesSlimeMarket", category: "ECONOMY", active: true },
         ]
     }
+}
+
+fn default_addon_ticker(_block: &SlimefunBlockData) -> u64 {
+    // Procesa el tick nativo para bloques de addons
+    1
 }
