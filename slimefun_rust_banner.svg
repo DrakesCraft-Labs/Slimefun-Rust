@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" width="920" height="320">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="sfBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#041208" />
+      <stop offset="50%" stop-color="#081E10" />
+      <stop offset="100%" stop-color="#030805" />
+    </linearGradient>
+
+    <!-- Slime Neon Green Gradient -->
+    <linearGradient id="slimeGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00FF66" />
+      <stop offset="50%" stop-color="#00E676" />
+      <stop offset="100%" stop-color="#76FF03" />
+    </linearGradient>
+
+    <!-- Rust Orange Gradient -->
+    <linearGradient id="rustOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF4500" />
+      <stop offset="100%" stop-color="#FF7300" />
+    </linearGradient>
+
+    <!-- Electric Cyan Gradient -->
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="100%" stop-color="#4FACFE" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="slimeGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="pulseFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes slimePulse {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.6)); opacity: 0.9; }
+      50% { filter: drop-shadow(0 0 35px rgba(0, 255, 102, 1)); opacity: 1; }
+    }
+    @keyframes energyFlow {
+      0% { stroke-dashoffset: 300; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes nodePulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .bg-main { fill: url(#sfBg); }
+    .title-sf { font-family: 'Outfit', 'Segoe UI', sans-serif; font-weight: 900; font-size: 44px; fill: url(#slimeGreen); animation: slimePulse 3.5s infinite ease-in-out; }
+    .subtitle-sf { font-family: 'Inter', 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; fill: #80E6A3; letter-spacing: 3px; }
+    .energy-path { stroke: url(#slimeGreen); stroke-width: 2.5; fill: none; stroke-dasharray: 15 8 5 8; animation: energyFlow 15s linear infinite; opacity: 0.5; }
+    .rust-path { stroke: url(#rustOrange); stroke-width: 2; fill: none; stroke-dasharray: 20 10; animation: energyFlow 20s linear infinite; opacity: 0.4; }
+    .badge-rect { fill: #0B2414; stroke: #00FF66; stroke-width: 1.5; rx: 8px; }
+    .badge-txt { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+  </style>
+
+  <!-- Background Layer -->
+  <rect class="bg-main" width="920" height="320" rx="16" stroke="#00FF66" stroke-width="1.5" />
+
+  <!-- Animated Circuit Grid Background -->
+  <path class="energy-path" d="M 40,50 H 880 M 40,270 H 880 M 80,0 V 320 M 840,0 V 320 M 40,160 H 260 M 660,160 H 880" />
+  <path class="rust-path" d="M 120,90 L 260,160 L 120,230 M 800,90 L 660,160 L 800,230" />
+
+  <!-- Central Slime & Energy Core Icon -->
+  <g transform="translate(460, 105)">
+    <!-- Outer Octagon Core -->
+    <polygon points="0,-45 32,-32 45,0 32,32 0,45 -32,32 -45,0 -32,-32" fill="#061F0E" stroke="url(#slimeGreen)" stroke-width="3" filter="url(#slimeGlow)" />
+    <!-- Inner Slime Cube -->
+    <rect x="-18" y="-18" width="36" height="36" rx="6" fill="url(#slimeGreen)" />
+    <circle cx="-5" cy="-5" r="3" fill="#FFFFFF" />
+    <circle cx="5" cy="-5" r="3" fill="#FFFFFF" />
+  </g>
+
+  <!-- Main Title & Subtitle -->
+  <text x="460" y="195" text-anchor="middle" class="title-sf">SLIMEFUN RUST ENGINE</text>
+  <text x="460" y="225" text-anchor="middle" class="subtitle-sf">44 ADDONS UNIFIED · ZERO RESET PERSISTENCE · NANOSECOND TICKER</text>
+
+  <!-- Badges -->
+  <g transform="translate(140, 255)">
+    <!-- Badge 1: 44 Addons -->
+    <rect x="0" y="0" width="165" height="34" class="badge-rect" />
+    <circle cx="20" cy="17" r="6" fill="#00FF66" filter="url(#pulseFilter)" />
+    <text x="35" y="22" class="badge-txt" fill="#00FF66">44 ADDONS INCLUDED</text>
+
+    <!-- Badge 2: Rust 2021 -->
+    <rect x="180" y="0" width="145" height="34" class="badge-rect" stroke="#FF4500" fill="#240B05" />
+    <circle cx="200" cy="17" r="6" fill="#FF4500" />
+    <text x="215" y="22" class="badge-txt" fill="#FF7300">RUST 2021 WS</text>
+
+    <!-- Badge 3: SQLite 0-Reset -->
+    <rect x="340" y="0" width="160" height="34" class="badge-rect" stroke="#00F2FE" fill="#051D24" />
+    <circle cx="360" cy="17" r="6" fill="#00F2FE" />
+    <text x="375" y="22" class="badge-txt" fill="#00F2FE">SQLITE 0-RESET</text>
+
+    <!-- Badge 4: Java 21 Panama -->
+    <rect x="515" y="0" width="130" height="34" class="badge-rect" stroke="#FFA751" fill="#241805" />
+    <circle cx="535" cy="17" r="6" fill="#FFA751" />
+    <text x="550" y="22" class="badge-txt" fill="#FFA751">JAVA 21 FFM</text>
+  </g>
+</svg>
