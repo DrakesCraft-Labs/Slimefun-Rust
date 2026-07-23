@@ -1,6 +1,6 @@
 <div align="center">
 
-![Slimefun-Rust Engine Banner](./slimefun_rust_banner.svg)
+  <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/Slimefun-Rust/main/slimefun_rust_banner.svg" alt="Slimefun-Rust Banner" width="920" />
 
 # 🧪 Slimefun-Rust Engine
 
