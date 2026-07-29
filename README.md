@@ -2,9 +2,9 @@
 
   <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/Slimefun-Rust/main/slimefun_rust_banner.svg" alt="Slimefun-Rust Banner" width="920" />
 
-# Slimefun-Rust Laboratory
+# Slimefun-Rust Engine
 
-**Experimental Rust workspace. Not loaded by the DrakesCraft production server.**
+**Native acceleration core for Slimefun and the DrakesCraft plugin ecosystem.**
 
 <p>
   <a href="https://github.com/DrakesCraft-Labs/Slimefun-Rust"><img src="https://img.shields.io/badge/GitHub-Slimefun--Rust-181717?style=for-the-badge&logo=github" alt="GitHub"/></a>
@@ -20,22 +20,31 @@
 
 ## Status
 
-This repository is an **archived research prototype**, not a supported
-replacement for Slimefun4. Its crates and benchmarks may be useful for isolated
-experiments, but they do not own production BlockStorage, EnergyNet, CargoNet,
-addon execution, or Bukkit lifecycle state.
+This repository is the **strategic native core** intended to accelerate shared
+work across Slimefun4-Drake, its addons and DrakesCraft-owned plugins. It is not
+retired.
 
-The canonical runtime is
-[Slimefun4-Drake](https://github.com/DrakesCraft-Labs/Slimefun4-Drake), built
-with Java 21 for Paper/Purpur 1.21.11. Production must not contain or load
-`slimefun_ffi.dll` or `libslimefun_ffi.so`.
+The architecture is currently in the **integration phase**. The Rust workspace
+contains the storage, ticker, energy, cargo, addon registry, FFI and service
+boundaries, but DrakesCraft production does not load the engine yet. Java
+remains authoritative until the native bridge has compatibility tests,
+observability, deterministic fallback and a verified Linux artifact.
 
-## Research scope
+## Runtime contract
 
-`Slimefun-Rust` explores native data structures, graph processing and FFI
-boundaries. The code must only run against disposable test fixtures. The addon
-table below is a classification catalog; it does not mean that 44 production
-addons are implemented, compatible, or safe to migrate.
+- Bukkit/Paper lifecycle and all world mutations remain on the server thread.
+- Java publishes immutable work snapshots to Rust and applies validated results.
+- Rust must never mutate live Bukkit objects from native worker threads.
+- Java remains the fallback when native loading or a native calculation fails.
+- Initial rollout is read-only/shadow mode; persistent writes require a separate
+  migration gate and verified backups.
+- Pterodactyl runs Linux, so production requires `libslimefun_ffi.so`.
+  `slimefun_ffi.dll` is only a Windows build and must not be placed in the live
+  Linux plugin directory.
+
+The addon table below is the target integration catalog. Entries marked by the
+registry are not proof that every addon already delegates production work to
+Rust.
 
 ---
 
@@ -56,10 +65,11 @@ Slimefun-Rust/
 
 ---
 
-## Storage warning
+## Storage integration
 
-The following API is an experiment. Never point it at the live
-`stored-blocks.db`; copy a test fixture first and verify it independently.
+Until schema detection, migrations and crash recovery are covered by tests,
+validate this API against copied fixtures rather than the live
+`stored-blocks.db`.
 
 El crate `slimefun-core` implementa una lectura/escritura bidireccional sobre la base de datos SQLite `stored-blocks.db` nativa de Slimefun4:
 
@@ -74,7 +84,7 @@ println!("Bloques Slimefun cargados en memoria nativa: {}", total_loaded);
 
 ---
 
-## 📋 Tabla de los 44 Addons Integrados
+## 📋 Target Addon Catalog
 
 | # | Addon de Slimefun | Categoría | Módulo en Rust |
 | :-: | :--- | :--- | :--- |
