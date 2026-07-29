@@ -2,9 +2,9 @@
 
   <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/Slimefun-Rust/main/slimefun_rust_banner.svg" alt="Slimefun-Rust Banner" width="920" />
 
-# 🧪 Slimefun-Rust Engine
+# Slimefun-Rust Laboratory
 
-**Motor Unificado de Alto Rendimiento en Rust 2021 para Slimefun4 Core y los 44 Addons de DrakesCraft**
+**Experimental Rust workspace. Not loaded by the DrakesCraft production server.**
 
 <p>
   <a href="https://github.com/DrakesCraft-Labs/Slimefun-Rust"><img src="https://img.shields.io/badge/GitHub-Slimefun--Rust-181717?style=for-the-badge&logo=github" alt="GitHub"/></a>
@@ -18,11 +18,24 @@
 
 ---
 
-## 📖 Descripción General
+## Status
 
-`Slimefun-Rust` es una arquitectura de **Monorepo en Rust (Workspace 2021)** diseñada para reemplazar el cuello de botella de rendimiento de Slimefun4 y sus 44 Addons en servidores Minecraft de alta demanda (Purpur 1.21.11).
+This repository is an **archived research prototype**, not a supported
+replacement for Slimefun4. Its crates and benchmarks may be useful for isolated
+experiments, but they do not own production BlockStorage, EnergyNet, CargoNet,
+addon execution, or Bukkit lifecycle state.
 
-Procesa las redes eléctricas (**EnergyNet**), las redes de transporte de ítems (**CargoNet**), la persistencia espacial SQLite y los tickers de máquinas en sub-hilos de CPU a velocidad nativa (nanosegundos) **sin pausas de Garbage Collector (GC)**.
+The canonical runtime is
+[Slimefun4-Drake](https://github.com/DrakesCraft-Labs/Slimefun4-Drake), built
+with Java 21 for Paper/Purpur 1.21.11. Production must not contain or load
+`slimefun_ffi.dll` or `libslimefun_ffi.so`.
+
+## Research scope
+
+`Slimefun-Rust` explores native data structures, graph processing and FFI
+boundaries. The code must only run against disposable test fixtures. The addon
+table below is a classification catalog; it does not mean that 44 production
+addons are implemented, compatible, or safe to migrate.
 
 ---
 
@@ -43,7 +56,10 @@ Slimefun-Rust/
 
 ---
 
-## 🛡️ Cero Reset de Servidor (`BlockStorageEngine`)
+## Storage warning
+
+The following API is an experiment. Never point it at the live
+`stored-blocks.db`; copy a test fixture first and verify it independently.
 
 El crate `slimefun-core` implementa una lectura/escritura bidireccional sobre la base de datos SQLite `stored-blocks.db` nativa de Slimefun4:
 
