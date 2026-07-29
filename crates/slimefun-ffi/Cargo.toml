@@ -11,6 +11,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 slimefun-core = { path = "../slimefun-core" }
 slimefun-energy = { path = "../slimefun-energy" }
+jni.workspace = true
 slimefun-cargo = { path = "../slimefun-cargo" }
 slimefun-addons = { path = "../slimefun-addons" }
 serde_json.workspace = true

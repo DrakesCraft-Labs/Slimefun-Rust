@@ -24,11 +24,10 @@ This repository is the **strategic native core** intended to accelerate shared
 work across Slimefun4-Drake, its addons and DrakesCraft-owned plugins. It is not
 retired.
 
-The architecture is currently in the **integration phase**. The Rust workspace
-contains the storage, ticker, energy, cargo, addon registry, FFI and service
-boundaries, but DrakesCraft production does not load the engine yet. Java
-remains authoritative until the native bridge has compatibility tests,
-observability, deterministic fallback and a verified Linux artifact.
+ABI 1 provides a tested Linux JNI bridge consumed by Slimefun4-Drake. EnergyNet
+uses native saturating aggregation and DrakesSlimeMarket delegates deterministic
+price calculation through the shared Bukkit service. Java remains authoritative
+for Bukkit state and provides the automatic fallback.
 
 ## Runtime contract
 
@@ -36,8 +35,8 @@ observability, deterministic fallback and a verified Linux artifact.
 - Java publishes immutable work snapshots to Rust and applies validated results.
 - Rust must never mutate live Bukkit objects from native worker threads.
 - Java remains the fallback when native loading or a native calculation fails.
-- Initial rollout is read-only/shadow mode; persistent writes require a separate
-  migration gate and verified backups.
+- Persistent native writes remain behind a separate migration gate and verified
+  backups.
 - Pterodactyl runs Linux, so production requires `libslimefun_ffi.so`.
   `slimefun_ffi.dll` is only a Windows build and must not be placed in the live
   Linux plugin directory.
@@ -45,6 +44,13 @@ observability, deterministic fallback and a verified Linux artifact.
 The addon table below is the target integration catalog. Entries marked by the
 registry are not proof that every addon already delegates production work to
 Rust.
+
+## ABI 1
+
+- `nativeAbiVersion`: bridge compatibility check.
+- `nativeSumSaturating`: EnergyNet aggregation with Java-equivalent overflow.
+- `nativeCalculateMarketPrice`: bounded market pricing for DrakesSlimeMarket.
+- `/sf native`: live availability, native calls, fallbacks and failures.
 
 ---
 
