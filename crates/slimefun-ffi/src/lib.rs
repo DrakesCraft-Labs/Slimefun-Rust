@@ -2,14 +2,15 @@ use jni::objects::{JClass, JIntArray};
 use jni::sys::{jdouble, jint, jlong};
 use jni::JNIEnv;
 use slimefun_core::{BlockStorageEngine, TickerEngine};
-use slimefun_energy::EnergyNetGraphSolver;
+use slimefun_energy::{EnergyNetGraphSolver, EnergyReport};
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
-use std::sync::OnceLock;
+use std::sync::{OnceLock, RwLock};
 
 static STORAGE_ENGINE: OnceLock<BlockStorageEngine> = OnceLock::new();
 static ENERGY_SOLVER: OnceLock<EnergyNetGraphSolver> = OnceLock::new();
 static TICKER_ENGINE: OnceLock<TickerEngine> = OnceLock::new();
+static ULTIMO_REPORTE: OnceLock<RwLock<EnergyReport>> = OnceLock::new();
 const ABI_VERSION: i32 = 1;
 
 fn get_storage() -> &'static BlockStorageEngine {
@@ -22,6 +23,10 @@ fn get_energy_solver() -> &'static EnergyNetGraphSolver {
 
 fn get_ticker() -> &'static TickerEngine {
     TICKER_ENGINE.get_or_init(TickerEngine::new)
+}
+
+fn ultimo_reporte() -> &'static RwLock<EnergyReport> {
+    ULTIMO_REPORTE.get_or_init(|| RwLock::new(EnergyReport::default()))
 }
 
 /// Carga la base de datos SQLite actual de Slimefun (`stored-blocks.db`) sin resetear el servidor.
@@ -56,15 +61,46 @@ pub extern "C" fn slimefun_save_sqlite_db(path_ptr: *const c_char) -> i64 {
     -1
 }
 
-/// Resuelve el ciclo de energía y el tick de todas las máquinas en velocidad nativa C/Rust (nanosegundos).
+/// Resuelve el reparto de energía y avanza el tick. Devuelve el número de tick.
+///
+/// Ojo con lo que **no** hace: el tick todavía no ejecuta la lógica de las máquinas, solo lleva
+/// la cuenta. Ver `TickerEngine::tick_all_machines`.
+///
+/// El resultado del reparto de energía se guarda para consultarlo aparte: antes se descartaba en
+/// el acto, así que el déficit de una red no llegaba a ninguna parte.
 #[no_mangle]
 pub extern "C" fn slimefun_execute_tick_cycle() -> u64 {
     let ticker = get_ticker();
     let storage = get_storage();
     let solver = get_energy_solver();
 
-    let _energy_generated = solver.solve_tick();
-    ticker.tick_all_machines(storage)
+    let energia = solver.solve_tick();
+    if let Ok(mut guard) = ultimo_reporte().write() {
+        *guard = energia;
+    }
+
+    ticker.tick_all_machines(storage).tick
+}
+
+/// Demanda que quedó sin cubrir en el último tick. 0 significa que la red va sobrada.
+///
+/// Es el dato que de verdad se quiere vigilar: una red hambrienta se nota como máquinas que se
+/// paran sin motivo aparente, y hasta ahora no había forma de verlo desde Java.
+#[no_mangle]
+pub extern "C" fn slimefun_last_unmet_demand() -> u64 {
+    ultimo_reporte().read().map(|r| r.unmet).unwrap_or(0)
+}
+
+/// Energía desperdiciada en el último tick por no caber en ningún capacitor.
+#[no_mangle]
+pub extern "C" fn slimefun_last_wasted_energy() -> u64 {
+    ultimo_reporte().read().map(|r| r.wasted).unwrap_or(0)
+}
+
+/// Energía generada en el último tick.
+#[no_mangle]
+pub extern "C" fn slimefun_last_generated_energy() -> u64 {
+    ultimo_reporte().read().map(|r| r.generated).unwrap_or(0)
 }
 
 /// Devuelve el número total de bloques registrados en BlockStorage.
