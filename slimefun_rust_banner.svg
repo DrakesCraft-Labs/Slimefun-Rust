@@ -74,7 +74,7 @@
   <path class="energy-path" d="M 40,50 H 880 M 40,270 H 880 M 80,0 V 320 M 840,0 V 320 M 40,160 H 260 M 660,160 H 880" />
   <path class="rust-path" d="M 120,90 L 260,160 L 120,230 M 800,90 L 660,160 L 800,230" />
 
-  <!-- Central Slime & Energy Core Icon -->
+  <!-- Central Slime &amp; Energy Core Icon -->
   <g transform="translate(460, 105)">
     <!-- Outer Octagon Core -->
     <polygon points="0,-45 32,-32 45,0 32,32 0,45 -32,32 -45,0 -32,-32" fill="#061F0E" stroke="url(#slimeGreen)" stroke-width="3" filter="url(#slimeGlow)" />
@@ -84,7 +84,7 @@
     <circle cx="5" cy="-5" r="3" fill="#FFFFFF" />
   </g>
 
-  <!-- Main Title & Subtitle -->
+  <!-- Main Title &amp; Subtitle -->
   <text x="460" y="195" text-anchor="middle" class="title-sf">SLIMEFUN RUST ENGINE</text>
   <text x="460" y="225" text-anchor="middle" class="subtitle-sf">44 ADDONS UNIFIED · ZERO RESET PERSISTENCE · NANOSECOND TICKER</text>
 
