@@ -62,6 +62,57 @@ Rust.
 - `nativeCalculateMarketPrice`: bounded market pricing for DrakesSlimeMarket.
 - `/sf native`: live availability, native calls, fallbacks and failures.
 
+### El nombre del paquete Java es parte del contrato — no renombrar
+
+Los simbolos que exporta `slimefun-ffi` se derivan del paquete de la clase Java, porque asi
+resuelve JNI los metodos `native`:
+
+```
+Java_io_github_thebusybiscuit_slimefun4_core_services_nativeengine_RustNativeEngine_nativeAbiVersion
+     └────────────── paquete Java ──────────────┘└──── clase ────┘└─── metodo ───┘
+```
+
+`RustNativeEngine` vive en `io.github.thebusybiscuit...` y **no** en el namespace de DrakesCraft,
+que es donde esta el resto del fork (679 ficheros contra 8). Parece una incoherencia del porteo
+y no lo es: ese arbol es la capa de compatibilidad que conservan los addons de terceros, y
+`NativeAccelerationService` forma parte de ella porque **DrakesSlimeMarket la importa** para el
+calculo de precios.
+
+Mover la clase de paquete rompe el motor en silencio: los simbolos del `.so` dejan de coincidir,
+`System.load` funciona pero `nativeAbiVersion()` lanza `UnsatisfiedLinkError`, y Slimefun cae al
+fallback de Java sin que nadie lo note salvo por `/sf native`.
+
+Si algun dia hay que renombrarlo, hay que hacer las tres cosas a la vez y en el mismo reinicio:
+
+1. Cambiar el paquete en `RustNativeEngine.java` y `NativeAccelerationService.java`.
+2. Renombrar las tres funciones `Java_...` en `crates/slimefun-ffi/src/`.
+3. Recompilar el `.so`, recompilar Slimefun4-Drake **y** recompilar DrakesSlimeMarket.
+
+Verificacion antes de desplegar:
+
+```bash
+cargo build --release -p slimefun-ffi
+nm -D --defined-only target/release/libslimefun_ffi.so | grep -oE 'Java_[A-Za-z0-9_]+'
+```
+
+Los tres simbolos que salgan tienen que coincidir exactamente con los metodos `native` que
+declara `RustNativeEngine.java`. Si no coinciden, no desplegar.
+
+### Estado verificado en produccion (2026-08-20)
+
+```
+Slimefun-Rust | Estado: ACTIVO
+ABI: 1 | Llamadas nativas: 171216 | Fallbacks: 79548 | Fallos: 0
+```
+
+Los fallbacks **no son errores**: son lotes por debajo de `native-engine.minimum-batch-size`
+(2 por defecto), donde cruzar a nativo cuesta mas de lo que ahorra. Cero fallos en 171.216
+llamadas es la señal de que el puente esta sano.
+
+El motor solo escribe una linea al arrancar --"Motor JNI activo (ABI 1)"-- asi que buscarlo en
+un log ya rotado da la impresion falsa de que no carga. **La comprobacion buena es `/sf native`**,
+no el log.
+
 ---
 
 ## 🏛️ Estructura del Monorepo
