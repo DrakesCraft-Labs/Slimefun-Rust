@@ -149,6 +149,65 @@ pub extern "system" fn Java_io_github_thebusybiscuit_slimefun4_core_services_nat
 }
 
 #[no_mangle]
+pub extern "system" fn Java_com_drakescraft_suites_core_nativeengine_NativeEngineBridge_nativeSumSaturating(
+    env: JNIEnv,
+    _class: JClass,
+    values: JIntArray,
+) -> jint {
+    let Ok(length) = env.get_array_length(&values) else {
+        return 0;
+    };
+    if length == 0 {
+        return 0;
+    }
+
+    let mut buffer = vec![0; length as usize];
+    if env.get_int_array_region(&values, 0, &mut buffer).is_err() {
+        return 0;
+    }
+    sum_saturating(&buffer)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_drakescraft_suites_core_nativeengine_NativeEngineBridge_nativeCheckBossAura(
+    _env: JNIEnv,
+    _class: JClass,
+    bx: jdouble,
+    by: jdouble,
+    bz: jdouble,
+    px: jdouble,
+    py: jdouble,
+    pz: jdouble,
+    radius: jdouble,
+) -> jint {
+    let dx = bx - px;
+    let dy = by - py;
+    let dz = bz - pz;
+    if (dx * dx + dy * dy + dz * dz) <= (radius * radius) {
+        1
+    } else {
+        0
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_drakescraft_suites_core_nativeengine_NativeEngineBridge_nativeEvaluateClock(
+    _env: JNIEnv,
+    _class: JClass,
+    _x: jint,
+    _y: jint,
+    _z: jint,
+    _is_structure: jint,
+    is_protected_sf: jint,
+) -> jint {
+    if is_protected_sf != 0 {
+        0 // ALLOW
+    } else {
+        0
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_io_github_thebusybiscuit_slimefun4_core_services_nativeengine_RustNativeEngine_nativeCalculateMarketPrice(
     _env: JNIEnv,
     _class: JClass,
